@@ -7,14 +7,8 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 
 
-
-
-@EnableAutoConfiguration
-@ComponentScan
 @SpringBootApplication
 public class CreditCardMgmtApplication {
-
-
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
 		return application.sources(CreditCardMgmtApplication.class);
 	}
