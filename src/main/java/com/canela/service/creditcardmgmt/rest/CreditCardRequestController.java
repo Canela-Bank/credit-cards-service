@@ -1,24 +1,24 @@
 package com.canela.service.creditcardmgmt.rest;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/creditcardmgmt")
+@RequestMapping("api/credit-card")
 public class CreditCardRequestController {
-	
+
     StringBuilder result = null;
 	
-	@PostMapping("requestCreditCard")
+	@PostMapping("/requestCreditCard")
 	public ResponseEntity<String> creditCardRequest(@RequestBody String client) {
 		try {
 			// Add URL API
@@ -95,6 +95,5 @@ public class CreditCardRequestController {
                 put("message", e.getMessage());
             }}.toString());
 		}
-	}
-	
+    }
 }
