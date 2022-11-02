@@ -7,50 +7,63 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.canela.service.creditcardmgmt.entity.Client;
+import com.canela.service.creditcardmgmt.exceptions.CreditCardBadRequestException;
+import com.canela.service.creditcardmgmt.exceptions.NoContentException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+
 @RestController
-@RequestMapping("api/creditcardmgmt")
+@RequestMapping("api/credit-card/request")
 public class CreditCardRequestController {
 	
-	  StringBuilder result = null;
+	StringBuilder result = null;
 	
-	@PostMapping("requestCreditCard")
-	public String creditCardRequest(@RequestBody String client) {
+	@PostMapping("/")
+	public String creditCardRequest(@RequestBody Client client) {
+	
+	//Data verification 
+		if(client.getDocument() == null || client.getType() == null) {			
+			throw new CreditCardBadRequestException();			
+		}
 		
-	    
 		try { 
+			//Convert Object Client to String
+			ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+			String clientString = ow.writeValueAsString(client);
+			
 			// Add URL API 
 			URL url = new URL ("http://localhost:8081/api/centralderiesgo/getReports");
-			
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			
+			// Create BodyRequest params 
             con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             con.setRequestProperty("Accept", "application/json");
             con.setDoOutput(true);
             con.setDoInput(true);
             con.setRequestMethod("POST");
             
+            // Write server body request
             OutputStream os = con.getOutputStream();
-            os.write(client.getBytes("UTF-8"));
+            os.write(clientString.getBytes("UTF-8"));
             os.close();         
             con.connect();
-                                    
-               int responseCode = con.getResponseCode();
               
-               if(responseCode != 200) {
-            	   throw new RuntimeException("Error" + responseCode);     	   
+            // ResponseCode verification
+               int responseCode = con.getResponseCode(); 
+               if(responseCode != HttpURLConnection.HTTP_OK) {
+            	   throw new NoContentException();	       	   
                }
+               
                else {
             	   
             	   try {
-            		   
+            		  // Read server response
                        InputStream in = new BufferedInputStream(con.getInputStream());
                        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
                        result = new StringBuilder();
@@ -58,31 +71,22 @@ public class CreditCardRequestController {
                        while ((line = reader.readLine()) != null) {
                            result.append(line);
                           
-                       }       
-                       
+                       }            
                        System.out.println("result: " + result.toString()) ;
                        
-                   
-                       try {
-                    	   JSONObject jObj = new JSONObject(result.toString());
-                    	    return "Request Sent...";
-                    	   
-     
-                       } catch (JSONException e) {
-                           System.out.println("Error parsing data " + e.toString()); 
-                       }  
-                       
+                       return "Request Sent...";
+   
                    } catch (Exception e) {
                        e.printStackTrace();
-                   }       	   
-            	   	                                 
+                   }       	      	                                 
                }
                		
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-			
-		return "Request Sent...";      	
+		
+		throw new CreditCardBadRequestException();	
+ 	
 	}
 	
 }
