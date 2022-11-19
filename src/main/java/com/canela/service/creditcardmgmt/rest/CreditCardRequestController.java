@@ -52,7 +52,7 @@ public class CreditCardRequestController {
                             put("points", (int) finalData1.get("points"));
                             put("status", "wait");
                         }};
-                        url = new URL("http://localhost:4000/graphql?query=mutation{createCreditQuery(document:1234567890,type:\"CC\",firstname:\"Jimmy\",lastname:\"Castro\",mail:\"ja.castros@javeriana.edu.co\",phone:\"3222412343\",request:\"card\",points:500,status:\"wait\"){document,firstname,lastname,request,status}}");
+                        url = new URL("http://localhost:3001/graphql?query=mutation%7B%0A%20%20createCreditCard(number%3A%202%2C%20cvv%3A502%2C%20exp_date%3A%222022-07-27%2020%3A08%3A16%22%2C%20card_name%3A%20%22David%20Raamirez%22%2C%20debt%3A%20152000%2C%20user_id%3A%221193093873%22%2C%20user_document_type%3A1)%7B%0A%20%20%20%20number%2C%0A%20%20%20%20cvv%2C%0A%20%20%20%20exp_date%2C%0A%20%20%20%20card_name%2C%0A%20%20%20%20debt%2C%0A%20%20%20%20user_id%2C%0A%20%20%20%20user_document_type%0A%20%20%7D%0A%7D%0A");
                         con = (HttpURLConnection) url.openConnection();
                         con.setRequestMethod("POST");
                         int responseCode2 = con.getResponseCode();
