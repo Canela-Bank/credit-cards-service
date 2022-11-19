@@ -34,9 +34,8 @@ public class CreditCardRequestController {
                     BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
                     result = new StringBuilder();
                     String line;
-                    while ((line = reader.readLine()) != null) {
+                    while ((line = reader.readLine()) != null)
                         result.append(line);
-                    }
                     try {
                         JSONObject body = new JSONObject(result.toString());
                         JSONObject data = (JSONObject) body.get("data");
