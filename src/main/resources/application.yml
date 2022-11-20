@@ -1,0 +1,6 @@
+server:
+  port: 9001
+
+application:
+  name: Credit card management service
+  description: Microservice for all the management around credit cards
