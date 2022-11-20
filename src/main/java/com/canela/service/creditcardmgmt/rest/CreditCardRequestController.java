@@ -26,12 +26,12 @@ public class CreditCardRequestController {
 
     private JSONObject generateCardInfo(){
         JSONObject object = new JSONObject();
-        byte bytes[] = new byte[5];
+        byte[] bytes = new byte[6];
         new Random().nextBytes(bytes);
-        object.put("number", new BigInteger(bytes));
+        object.put("number", new BigInteger(bytes).abs());
         object.put("cvv", new Random().nextInt(100, 1000));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        object.put("exp_date", LocalDate.EPOCH.plusYears(4).format(formatter));
+        object.put("exp_date", LocalDate.now().plusYears(4).format(formatter));
         return object;
     }
 	
