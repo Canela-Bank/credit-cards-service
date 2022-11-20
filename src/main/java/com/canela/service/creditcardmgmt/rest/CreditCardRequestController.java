@@ -2,8 +2,14 @@ package com.canela.service.creditcardmgmt.rest;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Random;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
@@ -17,14 +23,27 @@ import org.springframework.web.bind.annotation.RestController;
 public class CreditCardRequestController {
 
     StringBuilder result = null;
+
+    private JSONObject generateCardInfo(){
+        JSONObject object = new JSONObject();
+        byte bytes[] = new byte[5];
+        new Random().nextBytes(bytes);
+        object.put("number", new BigInteger(bytes));
+        object.put("cvv", new Random().nextInt(100, 1000));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        object.put("exp_date", LocalDate.EPOCH.plusYears(4).format(formatter));
+        return object;
+    }
 	
 	@PostMapping("/requestCreditCard")
 	public ResponseEntity<String> creditCardRequest(@RequestBody String client) {
 		try {
 			// Add URL API
             JSONObject clientObject = new JSONObject(client);
-            String type = (String) clientObject.get("type");
-            int document = (int) clientObject.get("document");
+            String type = clientObject.getString("type");
+            int document = clientObject.getInt("document");
+            String name = clientObject.getString("name");
+            double debt = clientObject.getDouble("debt");
 			URL url = new URL ("http://localhost:3000/api/prov/centralderiesgo/getReports/"+ type +"/"+ document +"");
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
@@ -52,9 +71,24 @@ public class CreditCardRequestController {
                             put("points", (int) finalData1.get("points"));
                             put("status", "wait");
                         }};
-                        url = new URL("http://localhost:3001/graphql?query=mutation%7B%0A%20%20createCreditCard(number%3A%202%2C%20cvv%3A502%2C%20exp_date%3A%222022-07-27%2020%3A08%3A16%22%2C%20card_name%3A%20%22David%20Raamirez%22%2C%20debt%3A%20152000%2C%20user_id%3A%221193093873%22%2C%20user_document_type%3A1)%7B%0A%20%20%20%20number%2C%0A%20%20%20%20cvv%2C%0A%20%20%20%20exp_date%2C%0A%20%20%20%20card_name%2C%0A%20%20%20%20debt%2C%0A%20%20%20%20user_id%2C%0A%20%20%20%20user_document_type%0A%20%20%7D%0A%7D%0A");
+                        JSONObject generated = generateCardInfo();
+                        int nType = 0;
+                        if(type.equals("CC"))
+                            nType = 1;
+                        else
+                            nType = 2;
+                        url = new URL("http://localhost:3002/graphql?query=mutation%7BcreateCreditCard(" +
+                                "number%3A" + (generated.getInt("number")) + "%2C" +
+                                "cvv%3A" + (generated.getInt("cvv")) + "%2C" +
+                                "exp_date%3A%22" + generated.getString("exp_date") + "%22%2C" +
+                                "card_name%3A%22" + URLEncoder.encode(name, StandardCharsets.UTF_8) + "%22%2C" +
+                                "debt%3A" + (debt) + "%2C" +
+                                "user_id%3A%22" + (document) + "%22%2C" +
+                                "user_document_type%3A" + nType + ")" +
+                                "%7Bnumber%2Ccvv%2Cexp_date%2Ccard_name%2Cdebt%2Cuser_id%2Cuser_document_type%7D%7D");
                         con = (HttpURLConnection) url.openConnection();
                         con.setRequestMethod("POST");
+                        System.out.println(con.getURL());
                         int responseCode2 = con.getResponseCode();
                         if(responseCode2 == HttpURLConnection.HTTP_OK){
                             reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
@@ -63,7 +97,7 @@ public class CreditCardRequestController {
                                 result.append(line);
                             }
                             JSONObject response = new JSONObject(result.toString());
-                            data = (JSONObject) ((JSONObject) response.get("data")).get("createCreditQuery");
+                            data = response.getJSONObject("data").getJSONObject("createCreditCard");
                             HttpURLConnection finalCon1 = con;
                             JSONObject finalData = data;
                             return ResponseEntity.status(HttpURLConnection.HTTP_OK).body(new JSONObject(){{
@@ -84,7 +118,7 @@ public class CreditCardRequestController {
             }
             HttpURLConnection finalCon = con;
             return ResponseEntity.status(responseCode).body(new JSONObject(){{
-                put("status", responseCode);
+                put("status", finalCon.getResponseCode());
                 put("message", finalCon.getResponseMessage());
             }}.toString());
 		} catch (Exception e) {
