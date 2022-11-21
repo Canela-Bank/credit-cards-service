@@ -29,11 +29,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/api/credit-card")
+@RequestMapping("/api/credit-cards")
 class DeleteCreditCardController {
 
     @DeleteMapping("/delete/{card_number}")
-    @CrossOrigin("*")
     public ResponseEntity deleteCreditCard(@PathVariable int card_number) {
         String url = "http://localhost:3002/graphql";
         try {
