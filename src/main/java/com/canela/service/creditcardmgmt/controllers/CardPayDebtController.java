@@ -120,6 +120,8 @@ public class CardPayDebtController {
                 final ObjectNode node = new ObjectMapper().readValue(actualResponse, ObjectNode.class);
                 if (node.get("data") == null) {
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Solicitud invalida");
+                } else {
+                    return ResponseEntity.status(HttpStatus.OK).body("Pago realizado");
                 }
             }
             else {
@@ -137,7 +139,6 @@ public class CardPayDebtController {
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There was an error");
     }
 
     private JSONObject requestAccount(String accountId) {
