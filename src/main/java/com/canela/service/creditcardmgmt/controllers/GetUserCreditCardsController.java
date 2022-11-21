@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping(value = "/api/credit-card")
+@RequestMapping(value = "/api/credit-cards")
 @Tag(name = "Credit Card", description = "Credit Card REST API")
 public class GetUserCreditCardsController {
 	
