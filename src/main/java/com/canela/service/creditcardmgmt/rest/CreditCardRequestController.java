@@ -28,7 +28,9 @@ public class CreditCardRequestController {
         JSONObject object = new JSONObject();
         byte[] bytes = new byte[6];
         new Random().nextBytes(bytes);
-        object.put("number", new BigInteger(bytes).abs());
+        Random random = new Random();
+        String accountId = String.valueOf(random.nextLong(1000000000L));
+        object.put("number", accountId);
         object.put("cvv", new Random().nextInt(100, 1000));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         object.put("exp_date", LocalDate.now().plusYears(4).format(formatter));
