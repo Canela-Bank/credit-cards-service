@@ -15,11 +15,10 @@ import java.net.ProtocolException;
 import java.net.URL;
 
 @RestController
-@RequestMapping(value = "/api/credit-card")
+@RequestMapping(value = "/api/credit-cards")
 public class CardPayDebtController {
 
-    @PutMapping(value = "pat-debt/{cardNumber}")
-    @CrossOrigin("*")
+    @PutMapping(value = "pay-debt/{cardNumber}")
     public ResponseEntity<String> payDebt (@PathVariable(value = "cardNumber") String cardNumber, @RequestBody PayDebtRequest payDebtRequest) {
         try {
             URL getCreditCardUrl = new URL("http://localhost:3002/graphql?query=query%7BgetCreditCardByNumber(number%3A" + cardNumber + ")%7B%0A%20%20%09number%2C%0A%20%20%09cvv%2C%0A%20%20%09exp_date%2C%0A%20%20%09card_name%2C%20%0A%20%20%09advancement_amount%2C%0A%20%20%09debt%2C%0A%20%20%09used_advancement%2C%0A%20%20%09user_id%0A%09%7D%0A%7D");
