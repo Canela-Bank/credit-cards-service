@@ -6,6 +6,6 @@ RUN mvn -f /home/app/pom.xml clean package
 
 # Java 17
 FROM openjdk:17
-COPY --from=build home/app/target/account-mgmt-0.0.1-SNAPSHOT.jar /home/app/app.jar
+COPY --from=build home/app/target/credit-card-mgmt-0.0.1-SNAPSHOT.jar /home/app/app.jar
 EXPOSE 9001
 ENTRYPOINT ["java","-jar","/home/app/app.jar"]
