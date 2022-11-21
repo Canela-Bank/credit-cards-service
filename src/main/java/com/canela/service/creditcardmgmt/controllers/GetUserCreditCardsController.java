@@ -36,7 +36,7 @@ public class GetUserCreditCardsController {
 	    public ResponseEntity<String> getUserCreditCards(@PathVariable String document, @PathVariable String typeDocument) {	 
 		 
 		 try {
-			// String url = "http://localhost:3001/graphql";
+			// String url = "http://localhost:3002/graphql";
 			 String operation = "getCreditCardsByUser";
 			 String query = "query{getCreditCardsByUser(user_document:\""+document+"\",user_document_type:"+typeDocument+"){\n"
 			 		+ "  number\n"
@@ -49,7 +49,7 @@ public class GetUserCreditCardsController {
 			 		+ "}}";
 			
 				 CloseableHttpClient client = HttpClientBuilder.create().build();
-			        HttpGet requestGraphQL = new HttpGet("http://localhost:3001/graphql");
+			        HttpGet requestGraphQL = new HttpGet("http://localhost:3002/graphql");
 			        URI uri = new URIBuilder(requestGraphQL.getURI())
 			                .addParameter("query", query)
 			                .build();
