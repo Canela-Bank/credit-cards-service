@@ -11,6 +11,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -32,9 +33,14 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/credit-cards")
 class DeleteCreditCardController {
 
+    @Value("${integrators.data.ip}")
+    private String dataIp;
+
+    @Value("${integrators.data.port}")
+    private String dataPort;
     @DeleteMapping("/delete/{card_number}")
     public ResponseEntity deleteCreditCard(@PathVariable int card_number) {
-        String url = "http://localhost:3002/graphql";
+        String url = "http://"+dataIp+":"+dataPort+"/graphql";
         try {
             String creditCardQuery = String.format("query {" +
                     "getCreditCardByNumber(number: %s) {" +
