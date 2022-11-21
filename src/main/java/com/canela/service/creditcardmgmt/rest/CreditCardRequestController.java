@@ -12,6 +12,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Random;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,6 +24,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class CreditCardRequestController {
 
     StringBuilder result = null;
+    @Value("${integrators.data.ip}")
+    private String dataIp;
+
+    @Value("${integrators.data.port}")
+    private String dataPort;
+
+    @Value("${integrators.providers.ip}")
+    private String providersIp;
+
+    @Value("${integrators.providers.port}")
+    private String providersPort;
 
     private JSONObject generateCardInfo(){
         JSONObject object = new JSONObject();
@@ -46,7 +58,7 @@ public class CreditCardRequestController {
             int document = clientObject.getInt("document");
             String name = clientObject.getString("name");
             double debt = clientObject.getDouble("debt");
-			URL url = new URL ("http://localhost:3000/api/prov/centralderiesgo/getReports/"+ type +"/"+ document +"");
+			URL url = new URL ("http://"+providersIp+":"+providersPort+"/api/prov/centralderiesgo/getReports/"+ type +"/"+ document +"");
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
             int responseCode = con.getResponseCode();
@@ -79,7 +91,7 @@ public class CreditCardRequestController {
                             nType = 1;
                         else
                             nType = 2;
-                        url = new URL("http://localhost:3002/graphql?query=mutation%7BcreateCreditCard(" +
+                        url = new URL("http://"+dataIp+":"+dataPort+"/graphql?query=mutation%7BcreateCreditCard(" +
                                 "number%3A" + (generated.getInt("number")) + "%2C" +
                                 "cvv%3A" + (generated.getInt("cvv")) + "%2C" +
                                 "exp_date%3A%22" + generated.getString("exp_date") + "%22%2C" +

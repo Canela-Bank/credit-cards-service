@@ -9,6 +9,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,11 +25,16 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping(value = "/api/credit-cards")
 public class CardPayDebtController {
+    @Value("${integrators.data.ip}")
+    private String dataIp;
+
+    @Value("${integrators.data.port}")
+    private String dataPort;
 
     @PutMapping(value = "pay-debt/{cardNumber}")
     public ResponseEntity<String> payDebt (@PathVariable(value = "cardNumber") String cardNumber, @RequestBody PayDebtRequest payDebtRequest) {
         try {
-            URL getCreditCardUrl = new URL("http://localhost:3002/graphql?query=query%20{%0A%20%20getCreditCardByNumber(number%3A"+cardNumber+")%20{%0A%20%20%20%20number%0A%20%20%20%20cvv%0A%20%20%20%20exp_date%0A%20%20%20%20card_name%0A%20%20%20%20debt%0A%20%20%20%20user_id%0A%20%20%20%20user_document_type%0A%20%20}%0A}");
+            URL getCreditCardUrl = new URL("http://"+dataIp+":"+dataPort+"/graphql?query=query%20{%0A%20%20getCreditCardByNumber(number%3A"+cardNumber+")%20{%0A%20%20%20%20number%0A%20%20%20%20cvv%0A%20%20%20%20exp_date%0A%20%20%20%20card_name%0A%20%20%20%20debt%0A%20%20%20%20user_id%0A%20%20%20%20user_document_type%0A%20%20}%0A}");
             HttpURLConnection connCreditCard = (HttpURLConnection) getCreditCardUrl.openConnection();
             connCreditCard.setRequestMethod("GET");
 
@@ -81,7 +87,7 @@ public class CardPayDebtController {
                 String user_id_cc = jsonCreditCard.getString("user_id");
                 Integer user_document_type_cc = jsonCreditCard.getInt("user_document_type");
 
-                String url = "http://localhost:3002/graphql";
+                String url = "http://"+dataIp+":"+dataPort+"/graphql";
                 String query = String.format("mutation {\n" +
                         "  createAccount(id: \"%s\", balance: %s, user_id: \"%s\", user_document_type: %d) {\n" +
                         "    id\n" +
@@ -144,7 +150,7 @@ public class CardPayDebtController {
     private JSONObject requestAccount(String accountId) {
 
         try {
-            String url = "http://localhost:3002/graphql?query=query%20%7B%0A%20%20getAccountById(id%3A%20%22"+accountId+"%22)%20%7B%0A%20%20%20%20id%0A%20%20%20%20balance%0A%20%20%20%20user_id%0A%20%20%20%20user_document_type%0A%20%20%7D%0A%7D";
+            String url = "http://"+dataIp+":"+dataPort+"/graphql?query=query%20%7B%0A%20%20getAccountById(id%3A%20%22"+accountId+"%22)%20%7B%0A%20%20%20%20id%0A%20%20%20%20balance%0A%20%20%20%20user_id%0A%20%20%20%20user_document_type%0A%20%20%7D%0A%7D";
             URL getCreditCardUrl = new URL(url);
             HttpURLConnection connCreditCard = (HttpURLConnection) getCreditCardUrl.openConnection();
             connCreditCard.setRequestMethod("POST");

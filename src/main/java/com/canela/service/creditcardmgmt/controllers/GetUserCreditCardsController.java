@@ -13,6 +13,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +31,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(value = "/api/credit-cards")
 @Tag(name = "Credit Card", description = "Credit Card REST API")
 public class GetUserCreditCardsController {
+
+	@Value("${integrators.data.ip}")
+	private String dataIp;
+
+	@Value("${integrators.data.port}")
+	private String dataPort;
 	
 	 @Operation(summary = "Get user credit cards", description = "Connect to the database and get the user credit cards", tags = {"Credit card"})
 	 @GetMapping(value = "/getCreditCards/{document}/{typeDocument}" )
@@ -49,7 +56,7 @@ public class GetUserCreditCardsController {
 			 		+ "}}";
 			
 				 CloseableHttpClient client = HttpClientBuilder.create().build();
-			        HttpGet requestGraphQL = new HttpGet("http://localhost:3002/graphql");
+			        HttpGet requestGraphQL = new HttpGet("http://"+dataIp+":"+dataPort+"/graphql");
 			        URI uri = new URIBuilder(requestGraphQL.getURI())
 			                .addParameter("query", query)
 			                .build();
