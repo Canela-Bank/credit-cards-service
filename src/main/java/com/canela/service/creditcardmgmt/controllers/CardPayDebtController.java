@@ -79,7 +79,7 @@ public class CardPayDebtController {
                 jsonCreditCard.put("debt", 0.0);
                 double debt = jsonCreditCard.getDouble("debt");
                 String user_id_cc = jsonCreditCard.getString("user_id");
-                String user_document_type_cc = jsonCreditCard.getString("user_document_type");
+                Integer user_document_type_cc = jsonCreditCard.getInt("user_document_type");
 
                 String url = "http://localhost:3002/graphql";
                 String query = String.format("mutation {\n" +
