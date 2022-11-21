@@ -7,9 +7,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
-@SpringBootApplication
+@SpringBootApplication (exclude = {DataSourceAutoConfiguration.class })
 public class CreditCardMgmtApplication {
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
 		return application.sources(CreditCardMgmtApplication.class);
