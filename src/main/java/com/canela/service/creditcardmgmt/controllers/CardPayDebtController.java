@@ -21,7 +21,7 @@ public class CardPayDebtController {
     @PutMapping(value = "pay-debt/{cardNumber}")
     public ResponseEntity<String> payDebt (@PathVariable(value = "cardNumber") String cardNumber, @RequestBody PayDebtRequest payDebtRequest) {
         try {
-            URL getCreditCardUrl = new URL("http://localhost:3002/graphql?query=query%7BgetCreditCardByNumber(number%3A" + cardNumber + ")%7B%0A%20%20%09number%2C%0A%20%20%09cvv%2C%0A%20%20%09exp_date%2C%0A%20%20%09card_name%2C%20%0A%20%20%09advancement_amount%2C%0A%20%20%09debt%2C%0A%20%20%09used_advancement%2C%0A%20%20%09user_id%0A%09%7D%0A%7D");
+            URL getCreditCardUrl = new URL("http://localhost:3002/graphql?query=query%20{%0A%20%20getCreditCardByNumber(number%3A"+cardNumber+")%20{%0A%20%20%20%20number%0A%20%20%20%20cvv%0A%20%20%20%20exp_date%0A%20%20%20%20card_name%0A%20%20%20%20debt%0A%20%20%20%20user_id%0A%20%20%20%20user_document_type%0A%20%20}%0A}");
             HttpURLConnection connCreditCard = (HttpURLConnection) getCreditCardUrl.openConnection();
             connCreditCard.setRequestMethod("GET");
 
@@ -57,7 +57,7 @@ public class CardPayDebtController {
                 }
 
                 //Updates account and creditCard
-                account.put("debt", account_balance-currentDebt);
+                account.put("balance", account_balance-currentDebt);
                 String id = account.get("id").toString();
                 double balance = Double.parseDouble(account.get("balance").toString());
                 String user_id = account.get("user_id").toString();
@@ -74,16 +74,7 @@ public class CardPayDebtController {
                 String user_id_cc = jsonCreditCard.getString("user_id");
                 String user_document_type_cc = jsonCreditCard.getString("user_document_type");
 
-                String updateUrl = "http://localhost:3001/graphql?query=mutation%20%7B%0A%20%20createCreditCard" +
-                        "(number%3A%20 " + number + " %2C%20cvv%3A%20" + cvv + "%2C%20exp_date%3A%20%22" + expDate +"%22%2C%20card_name" +
-                        "%3A%20%22" + card_name + "%22%2C%20debt%3A%20" + debt + "%2C%20user_id%3A%20%22" + user_id_cc + "%22%2C%20" +
-                        "user_document_type%3A%20" + user_document_type_cc + ")%20%7B%0A%20%20%20%20number%0A%20%20%20%20" +
-                        "cvv%0A%20%20%20%20exp_date%0A%20%20%20%20card_name%0A%20%20%20%20debt%0A%20%20%20%20" +
-                        "user_id%0A%20%20%20%20user_document_type%0A%20%20%7D%0A%20%20%0A%20%20" +
-                        "createAccount(id%3A%20%22" + id + "%22%2C%20balance%3A%20" + balance + "%2C%20" +
-                        "user_id%3A%20%22" + user_id + "%22%2C%20user_document_type%3A%20" + user_document_type + ")" +
-                        "%20%7B%0A%20%20%20%20id%0A%20%20%20%20balance%0A%20%20%20%20user_id%0A%20%20%20%20" +
-                        "user_document_type%0A%20%20%7D%0A%20%20%0A%7D";
+                String updateUrl = "http://localhost:3002/graphql?query=mutation%20%7B%0A%20%20createCreditCard(number%3A%20%20"+number+"%20%2C%20cvv%3A%20"+cvv+"%2C%20exp_date%3A%20%22"+expDate.replace("T", " ").replace("Z", "")+"%22%2C%20card_name%3A%20%22"+card_name+"%22%2C%20debt%3A%20"+debt+"%2C%20user_id%3A%20%22"+user_id_cc+"%22%2C%20user_document_type%3A%20"+user_document_type_cc+")%20%7B%0A%20%20%20%20number%0A%20%20%20%20cvv%0A%20%20%20%20exp_date%0A%20%20%20%20card_name%0A%20%20%20%20debt%0A%20%20%20%20user_id%0A%20%20%20%20user_document_type%0A%20%20%7D%0A%7D";
                 URL update = new URL(updateUrl);
                 HttpURLConnection connUpdate = (HttpURLConnection) update.openConnection();
                 connUpdate.setRequestMethod("POST");
@@ -111,7 +102,7 @@ public class CardPayDebtController {
     private JSONObject requestAccount(String accountId) {
 
         try {
-            String url = "http://localhost:3002/graphql?query=query%20%7B%0A%20%20getAccountById(id%3A%20%22" + accountId + "%22)%20%7B%0A%20%20%20%20id%0A%20%20%7D%0A%7D";
+            String url = "http://localhost:3002/graphql?query=query%20%7B%0A%20%20getAccountById(id%3A%20%22"+accountId+"%22)%20%7B%0A%20%20%20%20id%0A%20%20%20%20balance%0A%20%20%20%20user_id%0A%20%20%20%20user_document_type%0A%20%20%7D%0A%7D";
             URL getCreditCardUrl = new URL(url);
             HttpURLConnection connCreditCard = (HttpURLConnection) getCreditCardUrl.openConnection();
             connCreditCard.setRequestMethod("POST");
