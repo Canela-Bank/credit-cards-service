@@ -1,6 +1,52 @@
+spring:
+  profiles:
+    active: development
+
 server:
   port: 9001
 
 application:
   name: Credit card management service
   description: Microservice for all the management around credit cards
+
+integrators:
+  data:
+    port: 3002
+  providers:
+    port: 3000
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: development
+integrators:
+  data:
+    ip: localhost
+  providers:
+    ip: localhost
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: test
+integrators:
+  data:
+    ip: 10.1.0.19
+  providers:
+    ip: 10.2.0.193
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: production
+integrators:
+  data:
+    ip: 10.1.0.115
+  providers:
+    ip: 10.2.0.225
